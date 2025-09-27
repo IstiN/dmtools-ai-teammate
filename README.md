@@ -2,6 +2,47 @@
 
 This project demonstrates how to set up an AI teammate workflow that integrates with Jira, Confluence, and other tools using GitHub Actions. The AI teammate can automate tasks, analyze issues, and provide intelligent assistance for project management workflows.
 
+## Workflow Overview
+
+```mermaid
+flowchart TD
+    A[Jira Issue Assigned to AI Teammate] --> B[Jira Automation Rule Triggered]
+    B --> C[GitHub Webhook Called]
+    C --> D[GitHub Actions Workflow Started]
+    D --> E[DMTools CLI Executed]
+    E --> F[DMTools Reads Configuration]
+    F --> G[Instructions Prepared in input/ folder]
+    G --> H[CLI Commands Executed]
+    H --> I[Cursor Agent Runs]
+    I --> J[AI Processing with Instructions]
+    J --> K[Output Generated in outputs/response.md]
+    K --> L{Output Type?}
+    L -->|field| M[Post JS Action: Replace Description]
+    L -->|none| N[Post JS Action: Create Question Tickets]
+    M --> O[Jira Ticket Updated]
+    N --> P[New Jira Tickets Created]
+    O --> Q[Process Complete]
+    P --> Q
+
+    style A fill:#e1f5fe
+    style B fill:#f3e5f5
+    style C fill:#fff3e0
+    style D fill:#e8f5e8
+    style E fill:#fff8e1
+    style F fill:#fce4ec
+    style G fill:#f1f8e9
+    style H fill:#e3f2fd
+    style I fill:#f9fbe7
+    style J fill:#fff3e0
+    style K fill:#e8eaf6
+    style L fill:#fff9c4
+    style M fill:#ffebee
+    style N fill:#e0f2f1
+    style O fill:#f3e5f5
+    style P fill:#e1f5fe
+    style Q fill:#e8f5e8
+```
+
 ## Overview
 
 The AI teammate workflow uses:
@@ -287,7 +328,7 @@ The workflow includes extensive debugging output to help identify issues:
 
 ## License
 
-This project is provided as an example for setting up AI teammate workflows. Modify and use according to your organization's needs.
+This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
 
 ## Support
 
