@@ -5,42 +5,86 @@ This project demonstrates how to set up an AI teammate workflow that integrates 
 ## Workflow Overview
 
 ```mermaid
-flowchart TD
-    A[Jira Issue Assigned to AI Teammate] --> B[Jira Automation Rule Triggered]
-    B --> C[GitHub Webhook Called]
-    C --> D[GitHub Actions Workflow Started]
-    D --> E[DMTools CLI Executed]
-    E --> F[DMTools Reads Configuration]
-    F --> G[Instructions Prepared in input/ folder]
-    G --> H[CLI Commands Executed]
-    H --> I[Cursor Agent Runs]
-    I --> J[AI Processing with Instructions]
-    J --> K[Output Generated in outputs/response.md]
-    K --> L{Output Type?}
-    L -->|field| M[Post JS Action: Replace Description]
-    L -->|none| N[Post JS Action: Create Question Tickets]
-    M --> O[Jira Ticket Updated]
-    N --> P[New Jira Tickets Created]
-    O --> Q[Process Complete]
-    P --> Q
+sequenceDiagram
+    participant User as 👤 User
+    participant Jira as 🎫 Jira
+    participant JiraAuto as 🤖 Jira Automation
+    participant GitHub as 🐙 GitHub Actions
+    participant DMTools as 🔧 DMTools CLI
+    participant Cursor as 🤖 Cursor Agent
+    participant FS as 📁 File System
 
-    style A fill:#e1f5fe
-    style B fill:#f3e5f5
-    style C fill:#fff3e0
-    style D fill:#e8f5e8
-    style E fill:#fff8e1
-    style F fill:#fce4ec
-    style G fill:#f1f8e9
-    style H fill:#e3f2fd
-    style I fill:#f9fbe7
-    style J fill:#fff3e0
-    style K fill:#e8eaf6
-    style L fill:#fff9c4
-    style M fill:#ffebee
-    style N fill:#e0f2f1
-    style O fill:#f3e5f5
-    style P fill:#e1f5fe
-    style Q fill:#e8f5e8
+    Note over User, FS: AI Teammate Workflow Process
+
+    User->>Jira: Assigns issue to "AI Teammate"
+    Note right of Jira: Issue assigned with specific conditions
+    
+    Jira->>JiraAuto: Triggers automation rule
+    Note right of JiraAuto: Condition: Assignee = AI Teammate<br/>+ No "ai_questions_asked" label
+    
+    JiraAuto->>GitHub: POST webhook to workflow dispatch
+    Note right of GitHub: Sends config_file + encoded_config<br/>with issue key and initiator
+    
+    GitHub->>DMTools: Executes workflow with parameters
+    Note right of DMTools: Installs Cursor CLI + DMTools CLI
+    
+    DMTools->>FS: Creates input/ folder structure
+    Note right of FS: Prepares instructions from config
+    
+    DMTools->>DMTools: Reads agent configuration
+    Note right of DMTools: Loads story_description.json or<br/>story_questions.json
+    
+    DMTools->>FS: Writes instructions to input/ folder
+    Note right of FS: Contains JQL query, user context,<br/>AI role, and formatting rules
+    
+    DMTools->>Cursor: Executes CLI command
+    Note right of Cursor: ./cicd/scripts/run-cursor-agent.sh<br/>--model sonnet-4
+    
+    Cursor->>FS: Reads input/ folder
+    Note right of Cursor: Processes instructions and context
+    
+    Cursor->>Jira: Queries ticket data via JQL
+    Note right of Jira: Gets current description, comments,<br/>attachments, child tickets
+    
+    Cursor->>Cursor: AI Processing
+    Note right of Cursor: Analyzes content based on role<br/>and instructions
+    
+    Cursor->>FS: Writes output to outputs/response.md
+    Note right of FS: Generated content ready for processing
+    
+    alt Story Description Agent (outputType: "field")
+        DMTools->>DMTools: Executes assignForReview.js
+        Note right of DMTools: Post-processing script
+        
+        DMTools->>Jira: Updates ticket description
+        Note right of Jira: Replaces description field<br/>with enhanced content
+        
+        DMTools->>Jira: Assigns ticket for review
+        Note right of Jira: Changes assignee to reviewer
+        
+        DMTools->>Jira: Adds processing labels
+        Note right of Jira: Adds "ai_description_updated" label
+        
+    else Story Questions Agent (outputType: "none")
+        DMTools->>DMTools: Executes createQuestionsAndAssignForReview.js
+        Note right of DMTools: Parses JSON array from response.md
+        
+        loop For each question in JSON array
+            DMTools->>Jira: Creates new sub-ticket
+            Note right of Jira: Summary, Priority, Description<br/>from JSON object
+            
+            DMTools->>Jira: Links as child to parent
+            Note right of Jira: Sets parent-child relationship
+        end
+        
+        DMTools->>Jira: Adds "ai_questions_asked" label
+        Note right of Jira: Prevents duplicate processing
+        
+        DMTools->>Jira: Assigns parent ticket for review
+        Note right of Jira: Changes assignee to reviewer
+    end
+    
+    Note over User, FS: Process Complete - Jira Updated
 ```
 
 ## Overview
