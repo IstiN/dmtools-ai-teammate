@@ -21,7 +21,7 @@
       "fewShots" : "[\n  {\n    \"summary\": \"Clarify requirements\",\n    \"priority\": \"High\",\n    \"description\": \"Follow template from instructions.\"\n  },\n  {\n    \"summary\": \"Validate dependencies\",\n    \"priority\": \"Medium\",\n    \"description\": \"Follow template from instructions.\"\n  }\n]"
     },
     "cliCommands" : [
-      "./cicd/scripts/run-cursor-agent.sh --force --print \"user request is in 'input' folder, read all files there and do what is requested\""
+      "./cicd/scripts/run-cursor-agent.sh \"user request is in 'input' folder, read all files there and do what is requested\""
     ],
     "outputType" : "none",
     "ticketContextDepth" : 0,
