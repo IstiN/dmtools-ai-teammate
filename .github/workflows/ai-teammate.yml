@@ -68,7 +68,7 @@ jobs:
       - name: Run AI Teammate
         env:
           CURSOR_API_KEY: ${{ secrets.CURSOR_API_KEY }}
-          MODEL: sonnet-4
+          MODEL: sonnet-4.5
           AGENT_DISABLE_WATCHDOG: "1"
           PATH: "/home/runner/.local/bin:/home/runner/.dmtools/bin:/bin:/usr/bin:$PATH"
           # Jira Configuration
