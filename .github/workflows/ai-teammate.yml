@@ -14,7 +14,8 @@ on:
         required: false
       concurrency_key:
         description: 'Ticket key for concurrency grouping (e.g., JD-123)'
-        required: true
+        required: false
+        default: 'default'
 
 permissions:
   contents: write
